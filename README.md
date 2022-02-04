@@ -11,31 +11,58 @@ pandasは高機能なのでググるとたくさんの情報が出てくる。
 処理速度の観点は度外視。
 高速化を求められる場面に出くわしたらその時に考えりゃいい。
 
+
 ### 0. 表示を整える
 手間なしで他人に見せられるようにしておく
 
+    ```py
+    # 有効数字(小数点以下をそろえる)
+    pd.options.display.float_format = '{:.3f}'.format
+
+    # 有効数字(全体の桁数をそろえる)
+    pd.options.display.float_format = '{:.6g}'.format
+
+    # 表示を省略しない
+    pd.options.display.max_rows = None
+
+    # アライメント系
+    pd.set_option('display.unicode.east_asian_width', True)
+    pd.options.display.colheader_justify = 'left'
+    pd.options.display.colheader_justify = 'center'
+    pd.options.display.colheader_justify = 'right'
+
+
+    ```
+
+- 工学的記数法/工学表記
+
+pandasだと指数部分が e+02 とか e-07 とかになる。
+キロとかマイクロとかの単位で表示してくれると楽なのに。
+多少無理やりだが decimal ライブラリを使う方法を用意しておく
+ただし、全部が全部工学表記になるわけではなさそう。
+
 ```py
-# 有効数字(小数点以下をそろえる)
-pd.options.display.float_format = '{:.3f}'.format
+def conv_num_to_eng_string(x):
+    print(x)
+    if type(x) in [int, float, complex]:
+        x = decimal.Decimal(str(x)).normalize().to_eng_string()
+    return x
 
-# 有効数字(全体の桁数をそろえる)
-pd.options.display.float_format = '{:.6g}'.format
-
-# 有効数字(指数を3桁ステップにする)
-pd.options.display.float_format = '{:.6g}'.format
-
-
-# 表示を省略しない
-pd.options.display.max_rows = None
-
-# アライメント系
-pd.set_option('display.unicode.east_asian_width', True)
-pd.options.display.colheader_justify = 'left'
-pd.options.display.colheader_justify = 'center'
-pd.options.display.colheader_justify = 'right'
-
+df = df.applymap(conv_num_to_eng_string)
 
 ```
+
+
+これでいい感じにやってくれていそうな気もする。
+```py
+pd.options.display.float_format = '{:.3g}'.format
+```
+
+
+
+
+
+
 
 
 ### 1. 列の項目を先に決めて行を追加していく
