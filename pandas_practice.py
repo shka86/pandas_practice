@@ -62,7 +62,36 @@ def add_row_by_loc():
     print(df)
 
 
+def add_row_by_loc_2():
+    """ locを使う方法。dfの後ろに追加していく
+    """
+    print(f'\n### {inspect.currentframe().f_code.co_name}')
+
+    # 列の項目だけ定義した空のデータテーブルを作る
+    df = pd.DataFrame(
+        columns=['測定条件', 'データA', 'データB']
+    )
+
+    # 行のデータをリストに格納する。csvか何かからデータを取ってきた想定。
+    row0 = ['室温', 100.0, 1e-3]
+    row1 = ['50℃', 3000.43, 5.5e-6]
+    row2 = ['0℃', 10.26347, 8888e12]
+    rows = [
+        row0,
+        row1,
+        row2
+    ]
+
+    # 行を追加していく
+    len_df = len(df)
+    for i, row in enumerate(rows):
+        df.loc[i + len_df] = row
+
+    print(df)
+
+
 if __name__ == '__main__':
 
     add_row_by_append()
     add_row_by_loc()
+    add_row_by_loc_2()

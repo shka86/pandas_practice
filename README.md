@@ -67,9 +67,10 @@ pd.options.display.float_format = '{:.3g}'.format
 
 ### 1. 列の項目を先に決めて行を追加していく
 
-```py
-python sample1.py
-```
+- pandas_practice.py
+    - add_row_by_append()
+    - add_row_by_loc()
+    - add_row_by_loc_2()
 
 ## Requirement
 - python3  
