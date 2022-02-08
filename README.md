@@ -60,17 +60,40 @@ pd.options.display.float_format = '{:.3g}'.format
 
 
 
-
-
-
-
-
-### 1. 列の項目を先に決めて行を追加していく
+### 1: 列の項目を先に決めて行を追加していく
 
 - pandas_practice.py
     - add_row_by_append()
     - add_row_by_loc()
     - add_row_by_loc_2()
+
+
+### 2: 行の項目を先に決めて列を追加していく
+
+後日
+
+### 3: 集計
+
+```py
+# 要素がindex、出現個数をdataとするSeriesが返る
+vc = df['hoge'].value_counts()
+
+# indexのリストを取得する
+vc.index.values.tolist()
+
+```
+
+### 4: 条件に合う行・列を抽出する
+
+query は 文字列検索使い勝手が悪いから、ここに示すブールインデックスでの抽出を覚えたほうがいいだろ
+
+```py
+# hoge列が100の行を抽出する
+df_ = df[df['hoge'] == 100]
+
+
+```
+
 
 ## Requirement
 - python3  
