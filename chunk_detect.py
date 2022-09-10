@@ -11,15 +11,76 @@ import numpy as np
 
 """
 
-JUDGE_SPAN = 0.2
+PASS_SPAN = 0.2
+PASS_VALUE = 1
 LABEL_PASS = "PASS"
 LABEL_FAIL = "_F_A_I_L_"
-PARTLY_CHECK = [0, 1, 2]
+PARTLY_CHECK = [0, 1, 3]
+
+
+def chunk_detector(df):
+
+    df_summary = pd.DataFrame(
+        columns=df.columns,
+        index=["judge", "num_chunk", "span", "edge_left", "edge_right"])
+
+    df_bool = (df >= PASS_VALUE)
+    print(df_bool)
+
+    for col in df_bool:
+        num_chunk, span, edge_left, edge_right = chunk_detector_(df_bool[col])
+        df_summary.loc["span", col] = span
+        df_summary.loc["num_chunk", col] = num_chunk
+        df_summary.loc["edge_left", col] = edge_left
+        df_summary.loc["edge_right", col] = edge_right
+
+        if num_chunk == 3 and span >= PASS_SPAN:
+            judge = LABEL_PASS
+        else:
+            judge = LABEL_FAIL
+
+        df_summary.loc["judge", col] = judge
+
+    return df_summary
+
+
+def chunk_detector_(series):
+
+    state = False  # PASS_VALUE未満で開始することを期待
+    num_typechange = 0
+    num_chunk = 0
+    span = None
+    edge_left = None
+    edge_right = None
+
+    for i, v in series.iteritems():
+
+        if state:
+            if not v:
+                num_typechange += 1
+                state = False
+
+        else:
+            if v:
+                num_typechange += 1
+                state = True
+
+    num_chunk = num_typechange + 1
+    if num_chunk == 3 or True:
+        series = series.dropna()  # 中央のchunkだけ抜き出す
+        edge_left = series.index[0]
+        edge_right = series.index[-1]
+        span = edge_right - edge_left
+
+    return num_chunk, span, edge_left, edge_right
 
 
 def judgement(df_summary):
 
-    print("-----------------------------------\n")
+    print("-----------------------------------")
+    print(f"PASS_SPAN:  {PASS_SPAN}")
+    print(f"PASS_VALUE: {PASS_VALUE}")
+    print("---")
     print(df_summary)
     print("-----------------------------------\n")
     # 全体
@@ -38,59 +99,6 @@ def judgement(df_summary):
     print(f"   check for {PARTLY_CHECK}")
 
     print("\n-----------------------------------")
-
-def chunk_detector(df):
-
-    df_summary = pd.DataFrame(
-        columns=df.columns,
-        index=["judge", "num_chunk", "span", "edge_left", "edge_right"])
-
-    for col in df:
-        num_chunk, span, edge_left, edge_right = chunk_detector_(df[col])
-        df_summary.loc["span", col] = span
-        df_summary.loc["num_chunk", col] = num_chunk
-        df_summary.loc["edge_left", col] = edge_left
-        df_summary.loc["edge_right", col] = edge_right
-
-        if num_chunk == 3 and span >= JUDGE_SPAN:
-            judge = LABEL_PASS
-        else:
-            judge = LABEL_FAIL
-
-        df_summary.loc["judge", col] = judge
-
-    return df_summary
-
-
-def chunk_detector_(series):
-
-    state_isna = True  # 最初はNanで開始することを期待
-    num_typechange = 0
-    num_chunk = 0
-    span = None
-    edge_left = None
-    edge_right = None
-
-    for i, v in series.isna().iteritems():
-
-        if state_isna:
-            if not v:
-                num_typechange += 1
-                state_isna = False
-
-        else:
-            if v:
-                num_typechange += 1
-                state_isna = True
-
-    num_chunk = num_typechange + 1
-    if num_chunk == 3 or True:
-        series = series.dropna()  # 中央のchunkだけ抜き出す
-        edge_left = series.index[0]
-        edge_right = series.index[-1]
-        span = edge_right - edge_left
-
-    return num_chunk, span, edge_left, edge_right
 
 
 if __name__ == '__main__':
